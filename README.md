@@ -1,6 +1,6 @@
 # Snapper
 
-Your easy to use chrome extension for taking screenshots in your browser.
+Your easy-to-use chrome extension for taking screenshots in your browser.
 
 ## Installation
 
