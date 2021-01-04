@@ -1,3 +1,5 @@
+/* Styling for the popup */
+
 html, body {
     font-family: 'Helvetica', 'Arial', 'Sans-Serif';
     box-sizing: border-box;
@@ -5,15 +7,13 @@ html, body {
     width: 200px;
     background-color: #1F2933 ;
     color: #e6e6e6;
-}
-
-h2 {
-    margin: 10px 0px 0px 11px;
+    line-height: 1.2rem;
 }
 
 .btn-group {
     display: block;
     padding: 10px;
+    border-bottom: 1px #52606D solid;
 }
 
 .btn-group button {
@@ -25,6 +25,10 @@ h2 {
     background-color: #323F4B;
     color: #e6e6e6;
     outline: none;
+    font-size: 1em;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-align: left;
 }
 
 .btn-group button:hover {
@@ -33,4 +37,16 @@ h2 {
 
 .btn-group button:active {
     background-color: #52606D;
+}
+
+p {
+    font-size: 1em;
+    margin-left: 11px;
+    font-weight: bolder;
+    letter-spacing: 1px;
+}
+
+img {
+    margin-bottom: -4px;
+    margin-right: 7px;
 }

@@ -1,1 +1,1 @@
-// The logic for the user interface
+// The logic for the popup
