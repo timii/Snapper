@@ -4,10 +4,9 @@
 <html>
   <head>
     <title>Snapper</title>
-    <script src="popup.js"></script>
     <link href="popup.css" rel="stylesheet" type="text/css">
   </head>
-  <body>
+  <body class="dark-theme || light-theme">
     <div class="btn-group">
         <button id="customArea">
           <img src="images/area_white.png" alt="area image" width="17px" height="17px">Custom Area</button>
@@ -18,14 +17,16 @@
     </div>
     <!-- On/Off switch: https://proto.io/freebies/onoff/ -->
     <div class="darkmode">
-      <p>Dark Mode </p>
-      <div class="onoffswitch">
-        <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" tabindex="0" checked>
-        <label class="onoffswitch-label" for="myonoffswitch">
+      <p>Dark Mode</p>
+      <div class="onoffswitch-container">
+        <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="onoffswitch" tabindex="0" checked>
+        <label class="onoffswitch-label" for="onoffswitch">
             <span class="onoffswitch-inner"></span>
             <span class="onoffswitch-switch"></span>
         </label>
     </div>
     </div>
   </body>
+  <!-- Put the scripts at the end so all the elements are loaded -->
+  <script src="popup.js"></script>
 </html>

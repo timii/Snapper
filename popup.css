@@ -2,15 +2,21 @@
 
 @import url("https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500&display=swap");
 
-html,
+/* Light mode styles */
 body {
   font-family: "Rubik", sans-serif, "Helvetica", "Arial", "Sans-Serif";
   box-sizing: border-box;
   margin: 0;
   width: 200px;
+  background-color: #e6e6e6;
+  color: #1f2933;
+  line-height: 1.2rem;
+}
+
+/* Dark mode styles */
+body.dark-theme {
   background-color: #1f2933;
   color: #e6e6e6;
-  line-height: 1.2rem;
 }
 
 .btn-group {
@@ -44,7 +50,7 @@ body {
 
 p {
   font-size: 1.1em;
-  margin-left: 11px;
+  margin-left: 12px;
   font-weight: 500;
   letter-spacing: 1px;
   float: left;
@@ -57,7 +63,7 @@ img {
 
 /* On/Off Switch */
 
-.onoffswitch {
+.onoffswitch-container {
   margin: 7px 18px 7px 18px;
   float: left;
   position: relative;
