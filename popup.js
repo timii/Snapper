@@ -72,8 +72,8 @@ function clickVisibleContent() {
                     devicePixelRatio: window.devicePixelRatio
                 } 
 
-                // Send the image including additional information to other tab
-                sendImageToNewTab(data)
+                // Send the image including additional information to new tab
+                sendImageToNewTab(data, currentTab.id, currentTab.index)
             }
         })
     });
