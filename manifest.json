@@ -5,6 +5,14 @@
     "description": "An easy to use extension for taking screenshots in the browser",
     "version": "1.0",
 
+    "content_scripts": [
+        {
+          "matches": ["https://*/*", "http://*/*"],
+          "js": ["content.js"],
+          "run_at": "document_end"
+        }
+      ],
+
     "background": {
         "scripts": ["background.js"],
         "persistent": false

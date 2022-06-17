@@ -30,6 +30,42 @@ function getFilename(url) {
 }
 
 // 
+// Custom area button stuff
+// 
+
+// EventListener for "Custom Area" button
+document.getElementById("customArea").addEventListener("click", clickCustomArea);
+
+// Function to call when "Custom Area" button is clicked.
+// Calls everything needed to create a screenshot of a custom area
+function clickCustomArea() {
+    console.log("clickCustomArea clicked")
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+        var tab = tabs[0];
+        currentTab = tab // used in later calls to get tab info
+
+        var filename = getFilename(tab.url);
+        console.log("tabs: ", tabs, " tabs[0]: ", tab, " tab.url: ", tab.url)
+        console.log("currentTab size: ", currentTab.width, currentTab.height, " currentTab id: ", currentTab.id, " currentTab.url: ", currentTab.url, " currentTabIndex: ", currentTab.index)
+        console.log("filename: ", filename);
+
+        // Send message to content script to display overlay
+        openOverlayInCurrentTab(currentTab.id)
+
+        // Close popup
+        window.close()
+
+
+        // TODO: add overlay to current site and "stop" the page in the background (videos stop playing, animation pause, etc..)
+        // TODO: listen to mousedown event and draw rectangle from start position of mousedown to current mousedown position
+
+
+        // call api to create screenshot
+    });
+}
+
+
+// 
 // Visible content button stuff
 // 
 
@@ -40,7 +76,7 @@ var imagetest = document.getElementById("test")
 // Function to call when "Visible Content" button is clicked.
 function clickVisibleContent() {
     let filename;
-    
+
     // Get current active tab inforamtion 
     chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
         console.log(tabs[0]);
@@ -70,7 +106,7 @@ function clickVisibleContent() {
                     width: window.innerWidth,
                     height: window.innerHeight,
                     devicePixelRatio: window.devicePixelRatio
-                } 
+                }
 
                 // Send the image including additional information to new tab
                 sendImageToNewTab(data, currentTab.id, currentTab.index)
@@ -96,7 +132,9 @@ function clickFullPage() {
 
         var filename = getFilename(tab.url);
         console.log("tabs: ", tabs, " tabs[0]: ", tab, " tab.url: ", tab.url)
+        console.log("currentTab size: ", currentTab.width, currentTab.height, " currentTab id: ", currentTab.id, " currentTab.url: ", currentTab.url, " currentTabIndex: ", currentTab.index)
         console.log("filename: ", filename);
+
 
         // call api to create screenshot
     });
