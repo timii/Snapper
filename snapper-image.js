@@ -7,7 +7,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     console.log("image: ", image)
 
     // Scale down image
-    image.style.transform = 'scale(0.8)'
+    // image.style.transform = 'scale(0.8)'
     
     image.src = message.image
 
