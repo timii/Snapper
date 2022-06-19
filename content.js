@@ -8,12 +8,14 @@ const windowInnerWidthString = window.innerWidth.toString();
 const windowInnerHeightString = window.innerHeight.toString();
 
 // Variables for drawing the selection area in the canvas
+var canvasContext;
 var isDrawing = false;
-var canvasOffset;
 var offsetX;
 var offsetY;
 var startX;
 var startY;
+var mouseX;
+var mouseY;
 
 // Listen to the message sent by the background script to instantiate the overlay
 chrome.runtime.onMessage.addListener(
@@ -51,14 +53,12 @@ function createCanvasElement(imageURI) {
     // Set canvas properties
     canvas.setAttribute('id', canvasId)
     canvas.setAttribute('width', `${windowInnerWidthString}px`)
-    // canvas.setAttribute('width', `600px`)
     canvas.setAttribute('height', `${windowInnerHeightString}px`)
-    // canvas.setAttribute('height', `600px`)
 
     console.log("canvas: ", canvas);
 
     // Get canvas context to draw into the canvas
-    const canvasContext = canvas.getContext("2d");
+    canvasContext = canvas.getContext("2d");
 
     // Workaround to create an image element and setting the src to the imageURI to pass it into drawImage()
     const image = new Image;
@@ -77,10 +77,30 @@ function createCanvasElement(imageURI) {
     }
 
     canvas.onmousedown = (e) => {
-        console.log("mousedown: ", e)
+        console.log("mousedown: ", e);
         isDrawing = true;
         startX = parseInt(e.clientX - offsetX);
         startY = parseInt(e.clientY - offsetY);
+    }
+
+    canvas.onmouseup = (e) => {
+        console.log("mouseup: ", e);
+        isDrawing = false;
+
+        console.log("startX:", startX, " startY:", startY, "mouseX:", mouseX, " mouseY:", mouseY, " mouseX - startX:", mouseX - startX, " mouseY - startY:", mouseY - startY)
+    }
+
+    canvas.onmousemove = (e) => {
+        if (isDrawing) {
+            console.log("mousemove: ", e);
+            mouseX = parseInt(e.clientX - offsetX);
+            mouseY = parseInt(e.clientY - offsetY);
+
+            canvasContext.clearRect(0, 0, canvas.width, canvas.height);
+            canvasContext.beginPath();
+            canvasContext.rect(startX, startY, mouseX - startX, mouseY - startY);
+            canvasContext.stroke();
+        }
     }
 
     document.body.appendChild(canvas);
