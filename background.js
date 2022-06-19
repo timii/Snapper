@@ -25,10 +25,14 @@ function sendImageToNewTab(data, currentTabId, currentTabIndex) {
 }
 
 // Function that sends as message to the content script (content.js) to create an overlay for selecting the custom area
-function openOverlayInCurrentTab(currentTabId) {
-    chrome.tabs.sendMessage(currentTabId, {}, (responseCallback) => {
-        if (responseCallback) {
-            console.log("Message has reached the recipient (content.js)!")
-        }
-    });
+function openOverlayInCurrentTab(currentTabId, dataURI) {
+    setTimeout(() => {
+        chrome.tabs.sendMessage(currentTabId, { imageURI: dataURI }, (responseCallback) => {
+            if (responseCallback) {
+                console.log("Message has reached the recipient (content.js)!")
+            }
+
+            return true;
+        });
+    }, 100)
 }

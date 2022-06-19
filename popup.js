@@ -49,18 +49,25 @@ function clickCustomArea() {
         console.log("currentTab size: ", currentTab.width, currentTab.height, " currentTab id: ", currentTab.id, " currentTab.url: ", currentTab.url, " currentTabIndex: ", currentTab.index)
         console.log("filename: ", filename);
 
-        // Send message to content script to display overlay
-        openOverlayInCurrentTab(currentTab.id)
+        let imageURI = null;
+
+        chrome.tabs.captureVisibleTab(null, { format: 'png' }, (dataURI) => {
+            if (dataURI) {
+                imageURI = dataURI;
+
+                console.log("imageURL: ", imageURI, " dataURI: ", dataURI);
+
+                // Send message to content script to display overlay
+                openOverlayInCurrentTab(currentTab.id, imageURI)
+            }
+        });
 
         // Close popup
-        window.close()
+        // window.close()
 
 
-        // TODO: add overlay to current site and "stop" the page in the background (videos stop playing, animation pause, etc..)
         // TODO: listen to mousedown event and draw rectangle from start position of mousedown to current mousedown position
 
-
-        // call api to create screenshot
     });
 }
 

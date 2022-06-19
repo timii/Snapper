@@ -1,0 +1,46 @@
+.disable-scrolling {
+    height: 100%;
+    overflow: hidden;
+}
+
+#snapper-overlay {
+    background-color: black;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+#snapper-canvas {
+    cursor: crosshair;
+    z-index: 9950;
+    position: fixed;
+    border: 2px solid red;
+    top: 0;
+    left: 0;
+}
+
+#snapper-close-button {
+    width: 60px;
+    height: 60px;
+    position: fixed;
+    top: 30px;
+    right: 30px;
+    font-size: 50px;
+    color: white;
+    background-color: transparent;
+    background-repeat: no-repeat;
+    border: none;
+    overflow: hidden;
+    outline: none;
+    cursor: pointer;
+    z-index: 10001;
+    border-radius: 10px;
+    transition: background-color 0.25s;
+}
+
+#snapper-close-button:hover {
+    background-color: rgba(36, 36, 36, 0.5);
+}
