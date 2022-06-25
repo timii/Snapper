@@ -39,18 +39,19 @@ document.getElementById("customArea").addEventListener("click", clickCustomArea)
 // Function to call when "Custom Area" button is clicked.
 // Calls everything needed to create a screenshot of a custom area
 function clickCustomArea() {
-    console.log("clickCustomArea clicked")
+    // console.log("clickCustomArea clicked")
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         var tab = tabs[0];
         currentTab = tab // used in later calls to get tab info
 
         var filename = getFilename(tab.url);
-        console.log("tabs: ", tabs, " tabs[0]: ", tab, " tab.url: ", tab.url)
-        console.log("currentTab size: ", currentTab.width, currentTab.height, " currentTab id: ", currentTab.id, " currentTab.url: ", currentTab.url, " currentTabIndex: ", currentTab.index)
-        console.log("filename: ", filename);
+        // console.log("tabs: ", tabs, " tabs[0]: ", tab, " tab.url: ", tab.url)
+        // console.log("currentTab size: ", currentTab.width, currentTab.height, " currentTab id: ", currentTab.id, " currentTab.url: ", currentTab.url, " currentTabIndex: ", currentTab.index)
+        // console.log("filename: ", filename);
 
         let imageURI = null;
 
+        // Capture visible tab to draw the selection area over
         chrome.tabs.captureVisibleTab(null, { format: 'png' }, (dataURI) => {
             if (dataURI) {
                 imageURI = dataURI;
@@ -58,15 +59,12 @@ function clickCustomArea() {
                 console.log("imageURL: ", imageURI, " dataURI: ", dataURI);
 
                 // Send message to content script to display overlay
-                openOverlayInCurrentTab(currentTab.id, imageURI)
+                openOverlayInCurrentTab(currentTab, imageURI)
             }
         });
 
         // Close popup
         // window.close()
-
-
-        // TODO: listen to mousedown event and draw rectangle from start position of mousedown to current mousedown position
 
     });
 }
@@ -86,12 +84,12 @@ function clickVisibleContent() {
 
     // Get current active tab inforamtion 
     chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
-        console.log(tabs[0]);
+        // console.log(tabs[0]);
 
         currentTab = tabs[0];
         // currentTabId = currentTab.id
         // currentTabIndex = currentTabIndex.index
-        console.log("currentTab size: ", currentTab.width, currentTab.height, " currentTab id: ", currentTab.id, " currentTab.url: ", currentTab.url, " currentTabIndex: ", currentTab.index)
+        // console.log("currentTab size: ", currentTab.width, currentTab.height, " currentTab id: ", currentTab.id, " currentTab.url: ", currentTab.url, " currentTabIndex: ", currentTab.index)
 
         //  Create a filename from the site url and the current date and time
         filename = getFilename(currentTab.url)

@@ -23,5 +23,5 @@
         "default_popup": "popup.html"
     },
 
-    "permissions": ["activeTab", "storage", "unlimitedStorage", "tabs"]
+    "permissions": ["activeTab", "storage", "unlimitedStorage", "tabs", "<all_urls>"]
 }
