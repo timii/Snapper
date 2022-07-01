@@ -10,23 +10,20 @@ function getFilename(url) {
     // Get the hostname of the url 
     // e.g: https://developer.mozilla.org/en-US/docs/Web/API/URL/hostname 
     // -> hostname: 'developer.mozilla.org'
-    var name = url.hostname;
+    var hostname = url.hostname.split(".")[0];
+    var pathname = url.pathname.replace(/\//g, '-');
+
+    console.log("hostname:", hostname, " pathname:", pathname)
 
     // Get current date and time
     var today = new Date();
     date = today.getFullYear() + '-'
         + ('0' + (today.getMonth() + 1)).slice(-2) + '-'
         + ('0' + today.getDate()).slice(-2)
-    var time = today.getHours() + "-" + today.getMinutes() + "-" + today.getSeconds();
+    var time = today.getHours() + "_" + today.getMinutes() + "_" + today.getSeconds();
     var dateTime = date + '-' + time;
 
-    if (name) {
-        name = name.replace(/\./g, '-');
-        name = '-' + name;
-    }
-    else { name = ''; }
-
-    return 'snapper' + name + '-' + dateTime + '.png';
+    return 'snapper' + pathname + '-' + hostname + '-' + dateTime + '.png';
 }
 
 // 
@@ -39,15 +36,11 @@ document.getElementById("customArea").addEventListener("click", clickCustomArea)
 // Function to call when "Custom Area" button is clicked.
 // Calls everything needed to create a screenshot of a custom area
 function clickCustomArea() {
-    // console.log("clickCustomArea clicked")
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-        var tab = tabs[0];
-        currentTab = tab // used in later calls to get tab info
+        const currentTab = tabs[0];
 
-        var filename = getFilename(tab.url);
-        // console.log("tabs: ", tabs, " tabs[0]: ", tab, " tab.url: ", tab.url)
-        // console.log("currentTab size: ", currentTab.width, currentTab.height, " currentTab id: ", currentTab.id, " currentTab.url: ", currentTab.url, " currentTabIndex: ", currentTab.index)
-        // console.log("filename: ", filename);
+        // TODO: use filename as the name of the created screenshot
+        var filename = getFilename(currentTab.url);
 
         let imageURI = null;
 
@@ -56,15 +49,10 @@ function clickCustomArea() {
             if (dataURI) {
                 imageURI = dataURI;
 
-                console.log("imageURL: ", imageURI, " dataURI: ", dataURI);
-
                 // Send message to content script to display overlay
                 openOverlayInCurrentTab(currentTab, imageURI)
             }
         });
-
-        // Close popup
-        // window.close()
 
     });
 }
@@ -84,12 +72,7 @@ function clickVisibleContent() {
 
     // Get current active tab inforamtion 
     chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
-        // console.log(tabs[0]);
-
-        currentTab = tabs[0];
-        // currentTabId = currentTab.id
-        // currentTabIndex = currentTabIndex.index
-        // console.log("currentTab size: ", currentTab.width, currentTab.height, " currentTab id: ", currentTab.id, " currentTab.url: ", currentTab.url, " currentTabIndex: ", currentTab.index)
+        const currentTab = tabs[0];
 
         //  Create a filename from the site url and the current date and time
         filename = getFilename(currentTab.url)
@@ -100,10 +83,6 @@ function clickVisibleContent() {
                 console.log("filename: ", filename)
                 filename = filename.substring(0, filename.length - 4)
                 console.log("filename: ", filename)
-
-                // TODO: change active to true
-                // Create new tab
-                chrome.tabs.create({ active: false, url: 'snapper-image.html', openerTabId: currentTab.id, index: currentTab.index + 1 })
 
                 // Create data object including everything needed to show the image on the new tab
                 var data = {
@@ -156,5 +135,4 @@ document.querySelector(".onoffswitch-checkbox").addEventListener("click", onoff)
 // Function for the on/off switch for dark/light mode
 function onoff() {
     document.body.classList.toggle("dark-theme")
-    console.log("click: " + onoffswitch.checked)
 }
