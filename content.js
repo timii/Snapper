@@ -138,14 +138,12 @@ function addCloseButton() {
     closeButton.onclick = () => {
         // Remove all added elements from the body
         document.body.removeChild(canvas);
-        // document.body.removeChild(clippedCanvas);
         document.body.removeChild(overlay);
         document.body.removeChild(closeButton);
 
         // Unpause all paused videos
         // TODO: get al list of all play videos before and only pause them to unpause only them after so no videos get unpaused that werent playing before
         allVideosOnPage.forEach(vid => vid.play());
-        // console.log("all videos unpaued");
 
         // Enable scrolling again 
         document.body.classList.remove('disable-scrolling')
@@ -168,8 +166,6 @@ function clipCanvasAndCreateImage() {
     const image = new Image;
     image.src = visibleTabImageURI;
 
-    // console.log("image: ", image, " src: ", image.src)
-    // console.log("canvas: ", canvas)
 
     // Load the clipped canvas (selected area) into the new canvas
     image.onload = () => {
@@ -184,25 +180,22 @@ function clipCanvasAndCreateImage() {
             mouseX - startX, // width of the screenshot in the canvas (aspect ratio)
             mouseY - startY) // height of the screenshot in the canvas (aspect ratio)
 
-        // document.body.appendChild(clippedCanvas)
-
         // Turn into image
         clippedImageURI = clippedCanvas.toDataURL("image/png");
-        // console.log("clippedCanvas:", clippedCanvas)
-        console.log("clippedImage:", clippedImageURI);
 
         // Create data object including everything needed to show the image on the new tab
         var data = {
             image: clippedImageURI,
             width: window.innerWidth,
             height: window.innerHeight,
-            devicePixelRatio: window.devicePixelRatio
+            devicePixelRatio: window.devicePixelRatio,
+            action: "sendToBackground"
         }
 
         // Send a message to the background script to call sendImageToNewTab()
         chrome.runtime.sendMessage({ data: data, currentTabId: currentTab.id, currentTabIndex: currentTab.index }, (responseCallback) => {
             if (responseCallback) {
-                console.log("Message has reached the recipient (background.js)!")
+                console.log("Message has reached the recipient (background.js): call sendImageToNewTab() in background.js")
             }
 
             return true;

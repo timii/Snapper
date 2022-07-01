@@ -31,6 +31,10 @@
 }
 
 #snapper-close-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-content: center;
     width: 60px;
     height: 60px;
     position: fixed;
