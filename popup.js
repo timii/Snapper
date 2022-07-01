@@ -1,19 +1,11 @@
-// The logic for the popup
-
-var currentTab // result of chrome.tabs.query of current active tab
-
 // Function to create file name for the screenshot
 function getFilename(url) {
     // Creates a url object to parse the url more easily
     url = new URL(url);
 
-    // Get the hostname of the url 
-    // e.g: https://developer.mozilla.org/en-US/docs/Web/API/URL/hostname 
-    // -> hostname: 'developer.mozilla.org'
+    // Get the hostname and pathname of the url
     var hostname = url.hostname.split(".")[0];
     var pathname = url.pathname.replace(/\//g, '-');
-
-    console.log("hostname:", hostname, " pathname:", pathname)
 
     // Get current date and time
     var today = new Date();
@@ -23,7 +15,9 @@ function getFilename(url) {
     var time = today.getHours() + "_" + today.getMinutes() + "_" + today.getSeconds();
     var dateTime = date + '-' + time;
 
-    return 'snapper' + pathname + '-' + hostname + '-' + dateTime + '.png';
+    if (pathname !== "-") pathname += "-"
+
+    return 'snapper' + pathname + hostname + '-' + dateTime + '.png';
 }
 
 // 
@@ -111,12 +105,11 @@ document.getElementById("fullPage").addEventListener("click", clickFullPage);
 // Calls everything needed to create a full page screenshot
 function clickFullPage() {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-        var tab = tabs[0];
-        currentTab = tab // used in later calls to get tab info
+        const currentTab = tabs[0];
 
-        var filename = getFilename(tab.url);
-        console.log("tabs: ", tabs, " tabs[0]: ", tab, " tab.url: ", tab.url)
-        console.log("currentTab size: ", currentTab.width, currentTab.height, " currentTab id: ", currentTab.id, " currentTab.url: ", currentTab.url, " currentTabIndex: ", currentTab.index)
+        var filename = getFilename(currentTab.url);
+        // console.log("tabs: ", tabs, " tabs[0]: ", tab, " tab.url: ", tab.url)
+        // console.log("currentTab size: ", currentTab.width, currentTab.height, " currentTab id: ", currentTab.id, " currentTab.url: ", currentTab.url, " currentTabIndex: ", currentTab.index)
         console.log("filename: ", filename);
 
 
