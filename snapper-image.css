@@ -5,47 +5,75 @@ html, body {
     margin: 0;
     --box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
     font-family: 'Rubik', 'Epilogue', 'Segoe UI', 'Roboto', Geneva, Verdana, sans-serif;
+    font-weight: 500;
+    font-size: 16px;
+    color: white;
 }
 
-header {
-    /* background-color: green; */
-    height: 50px;
+.content_container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.header_container {
+    position: sticky;
+    width: 100%;
+    top: 0;
 }
 
 .header_bar {
     background-color: brown;
-    height: 100%;
+    height: 50px;
     width: 30%;
     margin: 5% auto 0;
     border-radius: 10px;
     box-shadow: var(--box-shadow);
     display: flex;
     align-items: center;
-    /* box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px; */
-    /* box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px; */
+    justify-content: center;
+    margin-top: 50px;
 }
 
-#header_text {
+.utils_container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: green;
+    width: 200px;
+    margin: auto;
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+.utils_button {
+    padding: 8px;
+    text-decoration: none;
     color: white;
-    margin-left: 15px;
-    font-weight: 500;
+    display: flex;
+    align-items: center;
 }
 
-.capture_container {
-    background-color: red;
-    width: 600px;
-    /* width: 80%; */
-    margin:50px auto;
-    padding-right: 40px;
-    border-radius: 10px;
-    box-shadow: var(--box-shadow);
-    /* box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px; */
+.utils_button:hover {
+    background-color: rgba(0, 214, 0, 0.5);
+}
+
+.button_icon {
+    font-size: 20px;
 }
 
 #capture_image {
-    position: relative;
-    margin: 20px;
-    max-width:100%;
-    height:100%;
+    max-width: 50%;
     object-fit: contain;
+    cursor: zoom-in;
+    box-shadow: var(--box-shadow);
+    border-radius: 10px;
+    margin-top: 50px;
+    transition: background-color 1s ease-in-out;
+}
+
+#capture_image.zoomed_in {
+    width: 80%;
+    max-width: 80%;
+    cursor: zoom-out;
 }

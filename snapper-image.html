@@ -4,22 +4,31 @@
 <head>
   <title>Snapper</title>
   <link href="snapper-image.css" rel="stylesheet" type="text/css">
+  <link rel="icon" href="images/icon.png">
 </head>
 
 <body>
-  <!-- TODO: Add styling to new tab -->
-  <!-- Header -->
-  <header>
-    <div class="header_bar">
-      <span id="header_text">Your Snapper Screenshot</span>
-    </div>
-  </header>
+  <div class="content_container">
 
-  <!-- Image Capture -->
-  <div class="capture_container">
+    <div class="header_container">
+      <!-- Header -->
+      <div class="header_bar">
+        <span id="header_text">Your Snapper Screenshot</span>
+      </div>
+
+      <!-- Screenshot utilities -->
+      <div class="utils_container">
+        <a class="utils_button" id="download_png" href="" download="">
+          .png<span class="button_icon">&nbsp;&#11123;</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Image Capture -->
     <img src="" alt="Your Snapper Image" id="capture_image">
+
   </div>
-  
+
   <script src="snapper-image.js"></script>
 </body>
 
