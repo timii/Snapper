@@ -93,39 +93,37 @@ function initiateFullPageScreenshot(currentTab, filename) {
             captureFullPageScreenshots(responseCallback)
         }
 
-        // return true;
     });
-
-    // Get height of body
-    // const bodyHeight = document.documentElement.scrollHeight
-    // console.log("bodyHeight:", bodyHeight)
-
-    // Divide body height with window height and round up
-    // Make as many screenshots as the result from before
-    // Cut away part of last screenshot
-    // Append images together
-    // Send to new tab
 }
 
+// Function to start the process of capturing the full page screenshots
 async function captureFullPageScreenshots(screenshotInfo) {
     console.log("captureFullPageScreenshots -> screenshotInfo:", screenshotInfo)
+    console.log("screenshotAmount:", screenshotInfo.screenshotAmount)
 
     var screenshotsArray = []
+
+    await sendMessageToResetScrolling("resetScrolling", screenshotInfo.currentTab)
 
     // Capture as many screenshots needed to capture the whole page
     for (let i = 0; i < screenshotInfo.screenshotAmount; i++) {
         console.log("in for -> i:", i)
 
-        // Capture screenshots and wait 1 second between each screenshot to bypass the "MAX_CAPTURE_VISIBLE_TAB_CALLS_PER_SECOND" error
-        await captureTab().then((createdScreenshot) => {
+        // Capture screenshot and wait 1 second between each screenshot to bypass the "MAX_CAPTURE_VISIBLE_TAB_CALLS_PER_SECOND" error
+        await captureTab().then(async (createdScreenshot) => {
 
             console.log("createdScreenshot:", createdScreenshot)
             console.log("screenshotsArray before:", screenshotsArray)
+            // Store the created screenshot into the array of all screenshots
             screenshotsArray.push(createdScreenshot)
             console.log("screenshotsArray after:", screenshotsArray)
+
+            console.log("windowHeight:", screenshotInfo.windowHeight)
+
+            // Send message to full page content script to scroll down
+            await sendMessageToScrollDown("scrollDownPage", screenshotInfo.windowHeight, screenshotInfo.currentTab)
         })
 
-        // Scroll down the window height between each screenshot to capture every part of the page
 
         // Cut away part of last screenshot
         // Append images together
@@ -134,67 +132,45 @@ async function captureFullPageScreenshots(screenshotInfo) {
     }
 }
 
+// Function to asynchronously capture the currently visible part of the active tab
 async function captureTab() {
     return new Promise(resolve => {
         setTimeout(() => {
             chrome.tabs.captureVisibleTab(null, { format: 'png' }, async dataURL => {
                 console.log("in captureVisibleTab")
                 if (dataURL) {
-                    console.log("dataURL:", dataURL)
-                    // console.log("screenshotsArray before:", screenshotsArray)
-                    // screenshotsArray.push(dataURL)
-                    // console.log("screenshotsArray after:", screenshotsArray)
+                    // console.log("dataURL:", dataURL)
                     resolve(dataURL)
                 }
             })
-            // chrome.tabs.create({ active: false, url: 'snapper-image.html', openerTabId: currentTabId, index: currentTabIndex + 1 }, async createdTab => {
-            //     chrome.tabs.onUpdated.addListener(function listener(tabId, info) {
-            //         console.log("not complete!")
-            //         if (info.status === "complete" && tabId === createdTab.id) {
-            //             console.log("complete!")
-            //             chrome.tabs.onUpdated.removeListener(listener);
-            //             resolve(createdTab);
-            //         }
-            //     })
-            // })
         }, 1000)
     })
 }
 
-// Function to listen to content script to call sendImageToNewTab()
-// chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-//     // Only call sendImageToNewTab() if the message was sent for the background script
-//     if (message.data.action === "captureFullPage") {
-//         console.log("background script: captureFullPage")
+// Function to call the full page content script to scroll down by the value widnowHeight
+async function sendMessageToScrollDown(action, windowHeight, currentTab) {
+    console.log("action:", action, " windowHeight:", windowHeight, " currentTab:", currentTab)
+    return new Promise(resolve => {
+        chrome.tabs.sendMessage(currentTab.id, { action: action, windowHeight: windowHeight }, (responseCallback) => {
+            if (responseCallback) {
+                console.log("Message has reached the recipient (content-full-page.js): Sent message to content script to scroll down by ")
+                resolve()
+            }
 
-//         // for (let i = 0; i < amountOfScreenshotsRounded; i++) {
-//         // captureVisibleContent
-//         chrome.tabs.captureVisibleTab(null, { format: 'png' }, (dataURL) => {
-//             if (dataURL) {
-//                 // console.log("filename: ", filename)
-//                 // filename = filename.substring(0, filename.length - 4)
-//                 // console.log("filename: ", filename)
+        });
+    })
+}
 
-//                 // Set filename to background script
-//                 // setFilename(filename);
+// Function to call the full page content script to reset the scrolling on the currently active tab
+async function sendMessageToResetScrolling(action, currentTab) {
+    console.log("action:", action, " currentTab:", currentTab)
+    return new Promise(resolve => {
+        chrome.tabs.sendMessage(currentTab.id, { action: action }, (responseCallback) => {
+            if (responseCallback) {
+                console.log("Message has reached the recipient (content-full-page.js): Reset scroll position to the top")
+                resolve()
+            }
 
-
-//                 // Create data object including everything needed to show the image on the new tab
-//                 // var data = {
-//                 //     image: dataURL,
-//                 //     width: window.innerWidth,
-//                 //     height: window.innerHeight,
-//                 //     devicePixelRatio: window.devicePixelRatio
-//                 // }
-
-//                 // Send the image including additional information to new tab
-//                 // sendImageToNewTab(data, currentTab.id, currentTab.index, filename)
-//             }
-//         })
-//         // }
-
-//         sendResponse(JSON.stringify(message, null, 4) || true)
-
-//         // return true;
-//     }
-// })
+        });
+    })
+}
