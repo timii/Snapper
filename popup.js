@@ -1,19 +1,21 @@
+'use strict';
+
 // Function to create file name for the screenshot
 function getFilename(url) {
     // Creates a url object to parse the url more easily
     url = new URL(url);
 
     // Get the hostname and pathname of the url
-    var hostname = url.hostname.split(".")[0];
+    const hostname = url.hostname.split(".")[0];
     var pathname = url.pathname.replace(/\//g, '-');
 
     // Get current date and time
-    var today = new Date();
-    date = today.getFullYear() + '-'
+    const today = new Date();
+    const date = today.getFullYear() + '-'
         + ('0' + (today.getMonth() + 1)).slice(-2) + '-'
         + ('0' + today.getDate()).slice(-2)
-    var time = today.getHours() + "_" + today.getMinutes() + "_" + today.getSeconds();
-    var dateTime = date + '-' + time;
+    const time = today.getHours() + "_" + today.getMinutes() + "_" + today.getSeconds();
+    const dateTime = date + '-' + time;
 
     if (pathname !== "-") pathname += "-"
 
@@ -43,8 +45,11 @@ function clickCustomArea() {
             if (dataURI) {
                 imageURI = dataURI;
 
+                // Set filename to background script
+                // setFilename(filename);
+
                 // Send message to content script to display overlay
-                openOverlayInCurrentTab(currentTab, imageURI)
+                openOverlayInCurrentTab(currentTab, imageURI, filename)
             }
         });
 
@@ -74,9 +79,13 @@ function clickVisibleContent() {
         // Start capturing the visible content of current active tab
         chrome.tabs.captureVisibleTab(null, { format: 'png' }, (dataURL) => {
             if (dataURL) {
-                console.log("filename: ", filename)
-                filename = filename.substring(0, filename.length - 4)
-                console.log("filename: ", filename)
+                // console.log("filename: ", filename)
+                // filename = filename.substring(0, filename.length - 4)
+                // console.log("filename: ", filename)
+
+                // Set filename to background script
+                // setFilename(filename);
+
 
                 // Create data object including everything needed to show the image on the new tab
                 var data = {
@@ -87,7 +96,7 @@ function clickVisibleContent() {
                 }
 
                 // Send the image including additional information to new tab
-                sendImageToNewTab(data, currentTab.id, currentTab.index)
+                sendImageToNewTab(data, currentTab.id, currentTab.index, filename)
             }
         })
     });
@@ -112,6 +121,13 @@ function clickFullPage() {
         // console.log("currentTab size: ", currentTab.width, currentTab.height, " currentTab id: ", currentTab.id, " currentTab.url: ", currentTab.url, " currentTabIndex: ", currentTab.index)
         console.log("filename: ", filename);
 
+        // Set filename to background script
+        // setFilename(filename);
+
+        initiateFullPageScreenshot(currentTab, filename);
+
+        // Send the image including additional information to new tab
+        // sendImageToNewTab(data, currentTab.id, currentTab.index, filename)
 
         // call api to create screenshot
     });

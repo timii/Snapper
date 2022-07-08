@@ -1,3 +1,5 @@
+'use strict';
+
 const overlayId = "snapper-overlay";
 const closeButtonId = "snapper-close-button";
 const canvasId = "snapper-canvas";
@@ -10,7 +12,9 @@ const windowInnerHeightString = window.innerHeight.toString();
 
 var currentTab;
 
-// Variables for drawing the selection area in the canvas
+var filename;
+
+// Variables for the canvas and drawing the selection area in the canvas
 var overlay;
 var canvas;
 var canvasContext;
@@ -31,27 +35,32 @@ var clippedImageURI;
 chrome.runtime.onMessage.addListener(
     (message, sender, sendResponse) => {
 
-        visibleTabImageURI = message.imageURI
-        currentTab = message.currentTab;
+        if (message.action === "createCustomAreaScreenshot") {
+            console.log("content script custom area:", message.filename)
 
-        if (!(document.getElementById(overlayId) && document.getElementById(closeButtonId) && document.getElementById(canvasId))) {
+            visibleTabImageURI = message.imageURI
+            currentTab = message.currentTab;
+            filename = message.filename
 
-            // Create canvas showing a screenshot of the page
-            canvas = createCanvasElement();
+            if (!(document.getElementById(overlayId) && document.getElementById(closeButtonId) && document.getElementById(canvasId))) {
 
-            // Create overlay
-            overlay = createOverlayElement();
+                // Create canvas showing a screenshot of the page
+                canvas = createCanvasElement();
 
-            // Add close button to overlay
-            addCloseButton();
+                // Create overlay
+                overlay = createOverlayElement();
 
-            // Disable scrolling when overlay is active
-            document.body.classList.add('disable-scrolling')
+                // Add close button to overlay
+                addCloseButton();
+
+                // Disable scrolling when overlay is active
+                document.body.classList.add('disable-scrolling')
+            }
+
+            sendResponse(JSON.stringify(message, null, 4) || true);
+
+            return true;
         }
-
-        sendResponse(JSON.stringify(message, null, 4) || true);
-
-        return true;
     }
 );
 
@@ -189,11 +198,11 @@ function clipCanvasAndCreateImage() {
             width: window.innerWidth,
             height: window.innerHeight,
             devicePixelRatio: window.devicePixelRatio,
-            action: "sendToBackground"
+            action: "sendCustomAreaScreenshot"
         }
 
         // Send a message to the background script to call sendImageToNewTab()
-        chrome.runtime.sendMessage({ data: data, currentTabId: currentTab.id, currentTabIndex: currentTab.index }, (responseCallback) => {
+        chrome.runtime.sendMessage({ data: data, currentTabId: currentTab.id, currentTabIndex: currentTab.index, filename: filename }, (responseCallback) => {
             if (responseCallback) {
                 console.log("Message has reached the recipient (background.js): call sendImageToNewTab() in background.js")
             }

@@ -8,8 +8,13 @@
     "content_scripts": [
         {
           "matches": ["https://*/*", "http://*/*"],
-          "js": ["content.js"],
-          "css": ["content.css"]
+          "js": ["content-custom-area.js"],
+          "css": ["content-custom-area.css"]
+        },
+        {
+          "matches": ["https://*/*", "http://*/*"],
+          "js": ["content-full-page.js"],
+          "css": ["content-full-page.css"]
         }
       ],
 
