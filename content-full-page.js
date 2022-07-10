@@ -135,10 +135,12 @@ chrome.runtime.onMessage.addListener(
 
                 for (let j = 0; j < message.args.screenshotsArray.length; j++) {
                     // Cut off as much of the last screenshot as it is overlapping the one before
-                    let cutoff = window.innerHeight * (message.args.cutoffPercent / 100)
-                    console.log("cutoff:", cutoff)
                     if (j === message.args.screenshotsArray.length - 1) {
-                        finalCanvasContext.drawImage(images[`image${j + 1}`], 0, currentDistanceFromTop - cutoff, window.innerWidth, window.innerHeight - cutoff);
+                        let cutoff = window.innerHeight * (message.args.cutoffPercent / 100)
+                        let newHeight = window.innerHeight - cutoff
+                        console.log("cutoff:", cutoff, " newHeight:", newHeight, " screenshot[j]:", message.args.screenshotsArray[j])
+                        // finalCanvasContext.drawImage(images[`image${j + 1}`], 0, currentDistanceFromTop - cutoff, window.innerWidth, window.innerHeight - cutoff);
+                        finalCanvasContext.drawImage(images[`image${j + 1}`], 0, cutoff, window.innerWidth, newHeight, 0, currentDistanceFromTop, window.innerWidth, newHeight);
                     } else {
                         finalCanvasContext.drawImage(images[`image${j + 1}`], 0, currentDistanceFromTop, window.innerWidth, window.innerHeight);
 
