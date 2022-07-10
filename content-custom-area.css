@@ -17,17 +17,8 @@
     cursor: crosshair;
     z-index: 9950;
     position: fixed;
-    /* border: 2px solid red; */
     top: 0;
     left: 0;
-}
-
-#snapper-clipped-canvas {
-    position: fixed;
-    z-index: 9951;
-    /* border: 2px solid green; */
-    top: 400;
-    left: 400;
 }
 
 #snapper-close-button {

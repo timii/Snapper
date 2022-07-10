@@ -125,11 +125,36 @@ async function captureFullPageScreenshots(screenshotInfo) {
         })
 
 
-        // Cut away part of last screenshot
-        // Append images together
-        // Send to new tab
 
     }
+    console.log("after for loop")
+
+    await sendMessageToCreateFullPageCanvas("createFullPageCanvas", screenshotInfo.currentTab, { screenshotsArray: screenshotsArray, cutoffPercent: screenshotInfo.cutoffPercent, windowHeight: screenshotInfo.windowHeight, bodyHeight: screenshotInfo.bodyHeight })
+
+    // // Append images together
+    // // Create canvas that will hold all the screenshots
+    // const fullPageCanvas = document.createElement('canvas')
+    // fullPageCanvas.setAttribute('id', "full-page-canvas")
+    // fullPageCanvas.setAttribute('width', "400px")
+    // fullPageCanvas.setAttribute('height', "400px")
+
+    // console.log('fullPageCanvas:', fullPageCanvas)
+
+    // // createCanvas(canvasId, `${windowInnerWidthString}px`, `${windowInnerHeightString}px`)
+
+    // // Get canvas context to draw into the canvas
+    // const canvasContext = fullPageCanvas.getContext("2d");
+
+    // // Workaround to create an image element and setting the src to the visibleTabImageURI to pass it into drawImage()
+    // const image = new Image;
+    // image.src = screenshotsArray[2];
+    // image.onload = () => canvasContext.drawImage(image, 0, 0)
+
+    // document.body.appendChild(fullPageCanvas);
+
+    // Cut away part of last screenshot
+
+    // Send to new tab
 }
 
 // Function to asynchronously capture the currently visible part of the active tab
@@ -168,6 +193,20 @@ async function sendMessageToResetScrolling(action, currentTab) {
         chrome.tabs.sendMessage(currentTab.id, { action: action }, (responseCallback) => {
             if (responseCallback) {
                 console.log("Message has reached the recipient (content-full-page.js): Reset scroll position to the top")
+                resolve()
+            }
+
+        });
+    })
+}
+
+// Function to call the full page content script to reset the scrolling on the currently active tab
+async function sendMessageToCreateFullPageCanvas(action, currentTab, args) {
+    console.log("action:", action, " currentTab:", currentTab, " args:", args)
+    return new Promise(resolve => {
+        chrome.tabs.sendMessage(currentTab.id, { action: action, args: args }, (responseCallback) => {
+            if (responseCallback) {
+                console.log("Message has reached the recipient (content-full-page.js): Create full page canvas")
                 resolve()
             }
 
