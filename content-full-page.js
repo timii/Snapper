@@ -89,6 +89,32 @@ chrome.runtime.onMessage.addListener(
         }
     })
 
+// Listen to background script to hide/show scrollbar
+chrome.runtime.onMessage.addListener(
+    (message, sender, sendResponse) => {
+
+        if (message.action === "hideScrollbar") {
+            console.log("hide scrollbar")
+
+            // Hide scrollbar
+            document.body.style.overflow = 'hidden';
+
+            sendResponse(JSON.stringify(message, null, 4) || true)
+
+            return true;
+        } else if (message.action === "showScrollbar") {
+            console.log("show scrollbar")
+
+            // Show scrollbar
+            document.body.style.overflow = 'visible';
+
+            sendResponse(JSON.stringify(message, null, 4) || true)
+
+            return true;
+
+        }
+    })
+
 // Listen to background script to create the full page canvas to hold all the screenshots
 chrome.runtime.onMessage.addListener(
     async (message, sender, sendResponse) => {

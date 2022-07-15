@@ -108,6 +108,7 @@ async function captureFullPageScreenshots(screenshotInfo) {
     console.log("currentScrollPostition in background:", currentScrollPostition)
 
     // Hide the scrollbar
+    await sendMessageToToggleScrollbar("hideScrollbar", screenshotInfo.currentTab)
 
     // Capture as many screenshots needed to capture the whole page
     for (let i = 0; i < screenshotInfo.screenshotAmount; i++) {
@@ -128,9 +129,10 @@ async function captureFullPageScreenshots(screenshotInfo) {
             await sendMessageToScrollDown("scrollDownPage", screenshotInfo.windowHeight, screenshotInfo.currentTab, screenshotInfo.filename)
         })
 
-        // Show the scrollbar again
 
     }
+    // Show the scrollbar again
+    await sendMessageToToggleScrollbar("showScrollbar", screenshotInfo.currentTab)
     console.log("after for loop")
     console.log("screenshotInfo:", screenshotInfo)
 
@@ -200,6 +202,21 @@ async function sendMessageToResetScrolling(action, currentTab) {
                 console.log("Message has reached the recipient (content-full-page.js): Reset scroll position to the top")
                 console.log("responseCallback:", responseCallback)
                 resolve(responseCallback === true ? 0 : responseCallback)
+            }
+
+        });
+    })
+}
+
+// Function to call the full page content script to hide/show the scrollbar
+async function sendMessageToToggleScrollbar(action, currentTab) {
+    console.log("action:", action, " currentTab:", currentTab)
+    return new Promise(resolve => {
+        chrome.tabs.sendMessage(currentTab.id, { action: action }, (responseCallback) => {
+            if (responseCallback) {
+                console.log("Message has reached the recipient (content-full-page.js): ", action === "hideScrollbar" ? "Hide" : "Show", "scrollbar")
+                console.log("responseCallback:", responseCallback)
+                resolve()
             }
 
         });
