@@ -103,7 +103,11 @@ async function captureFullPageScreenshots(screenshotInfo) {
 
     var screenshotsArray = []
 
-    await sendMessageToResetScrolling("resetScrolling", screenshotInfo.currentTab)
+    const currentScrollPostition = await sendMessageToResetScrolling("resetScrolling", screenshotInfo.currentTab)
+
+    console.log("currentScrollPostition in background:", currentScrollPostition)
+
+    // Hide the scrollbar
 
     // Capture as many screenshots needed to capture the whole page
     for (let i = 0; i < screenshotInfo.screenshotAmount; i++) {
@@ -121,15 +125,16 @@ async function captureFullPageScreenshots(screenshotInfo) {
             console.log("windowHeight:", screenshotInfo.windowHeight)
 
             // Send message to full page content script to scroll down
-            await sendMessageToScrollDown("scrollDownPage", screenshotInfo.windowHeight, screenshotInfo.currentTab)
+            await sendMessageToScrollDown("scrollDownPage", screenshotInfo.windowHeight, screenshotInfo.currentTab, screenshotInfo.filename)
         })
 
-
+        // Show the scrollbar again
 
     }
     console.log("after for loop")
+    console.log("screenshotInfo:", screenshotInfo)
 
-    await sendMessageToCreateFullPageCanvas("createFullPageCanvas", screenshotInfo.currentTab, { screenshotsArray: screenshotsArray, cutoffPercent: screenshotInfo.cutoffPercent, windowHeight: screenshotInfo.windowHeight, bodyHeight: screenshotInfo.bodyHeight })
+    await sendMessageToCreateFullPageCanvas("createFullPageCanvas", screenshotInfo.currentTab, { screenshotsArray: screenshotsArray, cutoffPercent: screenshotInfo.cutoffPercent, windowHeight: screenshotInfo.windowHeight, bodyHeight: screenshotInfo.bodyHeight, filename: screenshotInfo.filename, startScrollPosition: currentScrollPostition })
 
     // // Append images together
     // // Create canvas that will hold all the screenshots
@@ -193,7 +198,8 @@ async function sendMessageToResetScrolling(action, currentTab) {
         chrome.tabs.sendMessage(currentTab.id, { action: action }, (responseCallback) => {
             if (responseCallback) {
                 console.log("Message has reached the recipient (content-full-page.js): Reset scroll position to the top")
-                resolve()
+                console.log("responseCallback:", responseCallback)
+                resolve(responseCallback === true ? 0 : responseCallback)
             }
 
         });
@@ -204,7 +210,7 @@ async function sendMessageToResetScrolling(action, currentTab) {
 async function sendMessageToCreateFullPageCanvas(action, currentTab, args) {
     console.log("action:", action, " currentTab:", currentTab, " args:", args)
     return new Promise(resolve => {
-        chrome.tabs.sendMessage(currentTab.id, { action: action, args: args }, (responseCallback) => {
+        chrome.tabs.sendMessage(currentTab.id, { action: action, currentTab: currentTab, args: args }, (responseCallback) => {
             if (responseCallback) {
                 console.log("Message has reached the recipient (content-full-page.js): Create full page canvas")
                 resolve()
@@ -213,3 +219,18 @@ async function sendMessageToCreateFullPageCanvas(action, currentTab, args) {
         });
     })
 }
+
+// Function to listen to full page content script to call sendImageToNewTab()
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    // Only call sendImageToNewTab() if the message was sent for the background script
+    if (message.data.action === "sendFullPageScreenshot") {
+
+        console.log("sendImageToNewTab for full page image")
+        // Call sendImageToNewTab() with the new screenshot of the selected area
+        sendImageToNewTab(message.data, message.currentTabId, message.currentTabIndex, message.filename)
+
+        sendResponse(JSON.stringify(message, null, 4) || true)
+
+        // return true;
+    }
+})
