@@ -1,5 +1,7 @@
 'use strict';
 
+const stickyAndFixedElementsArray2 = []
+
 // Listen to the message sent by the background script to create the full page screenshot
 chrome.runtime.onMessage.addListener(
     (message, sender, sendResponse) => {
@@ -89,6 +91,63 @@ chrome.runtime.onMessage.addListener(
         }
     })
 
+// Listen to background script to set/reset fixed and sticky elements
+chrome.runtime.onMessage.addListener(
+    (message, sender, sendResponse) => {
+        console.log("message fixed and sticky:", message)
+
+
+
+        if (message.action === "setStatic") {
+            console.log("set elements position as static")
+
+            getStickyAndFixedElements((fixedAndStickyElementsArray) => {
+                console.log("in callback")
+
+                console.log("fixedAndStickyElementsArray after:", fixedAndStickyElementsArray)
+                console.log("stickyAndFixedElementsArray2 after:", stickyAndFixedElementsArray2)
+
+                sendResponse(JSON.stringify(message, null, 4) || true)
+
+                return true;
+            })
+
+        } else if (message.action === "resetToStickyAndFixed") {
+            console.log("reset elements position to sticky and fixed")
+            console.log("message.elementsArray:", message.elementsArray)
+            console.log("stickyAndFixedElementsArray2 in reset:", stickyAndFixedElementsArray2)
+
+            for (let i = 0; i < stickyAndFixedElementsArray2.length; i++) {
+                console.log("stickyAndFixedElementsArray2[i]:", stickyAndFixedElementsArray2[i])
+                stickyAndFixedElementsArray2[i].style.removeProperty('position')
+            }
+            sendResponse(JSON.stringify(message, null, 4) || true)
+
+            return true;
+
+        }
+    })
+
+function getStickyAndFixedElements() {
+    // let fixedAndStickyElementsArray = []
+
+    // Get every element from the DOM
+    let elems = document.body.getElementsByTagName("*");
+
+    for (let i = 0; i < elems.length; i++) {
+
+        let elemPosition = window.getComputedStyle(elems[i], null).getPropertyValue('position')
+        // Only add every element that is sticky or fixed
+        if (elemPosition == 'fixed' || elemPosition == 'sticky') {
+            console.log(elems[i])
+            elems[i].style.setProperty('position', 'static', 'important')
+            // fixedAndStickyElementsArray.push(elems[i])
+            stickyAndFixedElementsArray2.push(elems[i])
+        }
+
+    }
+}
+
 // Listen to background script to hide/show scrollbar
 chrome.runtime.onMessage.addListener(
     (message, sender, sendResponse) => {
@@ -99,20 +158,16 @@ chrome.runtime.onMessage.addListener(
             // Hide scrollbar
             document.body.style.overflow = 'hidden';
 
-            sendResponse(JSON.stringify(message, null, 4) || true)
-
-            return true;
         } else if (message.action === "showScrollbar") {
             console.log("show scrollbar")
 
             // Show scrollbar
             document.body.style.overflow = 'visible';
 
-            sendResponse(JSON.stringify(message, null, 4) || true)
-
-            return true;
-
         }
+        sendResponse(JSON.stringify(message, null, 4) || true)
+
+        return true;
     })
 
 // Listen to background script to create the full page canvas to hold all the screenshots
@@ -124,7 +179,7 @@ chrome.runtime.onMessage.addListener(
             console.log("message.currentTab:", message.currentTab)
             console.log("create full page canvas")
 
-            // finalCanvasPromise.then(finalCanvas => {
+            // Create canvas that will hold all the screenshots
             const finalCanvas = document.createElement('canvas')
             finalCanvas.setAttribute('id', "snapper-full-page-canvas")
             finalCanvas.setAttribute('width', `${window.innerWidth}px`)
@@ -145,6 +200,7 @@ chrome.runtime.onMessage.addListener(
 
             let fullPageImage
 
+            // Append images together in the canvas
             loadImages(sources, message.args.screenshotsArray.length, function (images) {
                 let currentDistanceFromTop = 0;
 

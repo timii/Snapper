@@ -107,7 +107,7 @@ async function captureFullPageScreenshots(screenshotInfo) {
 
     console.log("currentScrollPostition in background:", currentScrollPostition)
 
-    // Hide the scrollbar
+    // Hide the scrollbar while taking screenshots
     await sendMessageToToggleScrollbar("hideScrollbar", screenshotInfo.currentTab)
 
     // Capture as many screenshots needed to capture the whole page
@@ -125,43 +125,27 @@ async function captureFullPageScreenshots(screenshotInfo) {
 
             console.log("windowHeight:", screenshotInfo.windowHeight)
 
+            if (i === 0) {
+                // Set fixed and sticky elements to static after the first screenshot to hide them from every screenshot after it
+                await sendMessageToToggleStickyAndFixedElements("setStatic", screenshotInfo.currentTab)
+            }
+
             // Send message to full page content script to scroll down
             await sendMessageToScrollDown("scrollDownPage", screenshotInfo.windowHeight, screenshotInfo.currentTab, screenshotInfo.filename)
         })
 
 
     }
-    // Show the scrollbar again
+
+    // Reset fixed and sticky elements after all screenshots have been taken
+    await sendMessageToToggleStickyAndFixedElements("resetToStickyAndFixed", screenshotInfo.currentTab)
+
+    // Show the scrollbar after all the screenshots have been taken
     await sendMessageToToggleScrollbar("showScrollbar", screenshotInfo.currentTab)
     console.log("after for loop")
     console.log("screenshotInfo:", screenshotInfo)
 
     await sendMessageToCreateFullPageCanvas("createFullPageCanvas", screenshotInfo.currentTab, { screenshotsArray: screenshotsArray, cutoffPercent: screenshotInfo.cutoffPercent, windowHeight: screenshotInfo.windowHeight, bodyHeight: screenshotInfo.bodyHeight, filename: screenshotInfo.filename, startScrollPosition: currentScrollPostition })
-
-    // // Append images together
-    // // Create canvas that will hold all the screenshots
-    // const fullPageCanvas = document.createElement('canvas')
-    // fullPageCanvas.setAttribute('id', "full-page-canvas")
-    // fullPageCanvas.setAttribute('width', "400px")
-    // fullPageCanvas.setAttribute('height', "400px")
-
-    // console.log('fullPageCanvas:', fullPageCanvas)
-
-    // // createCanvas(canvasId, `${windowInnerWidthString}px`, `${windowInnerHeightString}px`)
-
-    // // Get canvas context to draw into the canvas
-    // const canvasContext = fullPageCanvas.getContext("2d");
-
-    // // Workaround to create an image element and setting the src to the visibleTabImageURI to pass it into drawImage()
-    // const image = new Image;
-    // image.src = screenshotsArray[2];
-    // image.onload = () => canvasContext.drawImage(image, 0, 0)
-
-    // document.body.appendChild(fullPageCanvas);
-
-    // Cut away part of last screenshot
-
-    // Send to new tab
 }
 
 // Function to asynchronously capture the currently visible part of the active tab
@@ -215,6 +199,21 @@ async function sendMessageToToggleScrollbar(action, currentTab) {
         chrome.tabs.sendMessage(currentTab.id, { action: action }, (responseCallback) => {
             if (responseCallback) {
                 console.log("Message has reached the recipient (content-full-page.js): ", action === "hideScrollbar" ? "Hide" : "Show", "scrollbar")
+                console.log("responseCallback:", responseCallback)
+                resolve()
+            }
+
+        });
+    })
+}
+
+// Function to call the full page content script to set/reset fixed and sticky elements
+async function sendMessageToToggleStickyAndFixedElements(action, currentTab) {
+    console.log("action:", action, " currentTab:", currentTab)
+    return new Promise(resolve => {
+        chrome.tabs.sendMessage(currentTab.id, { action: action }, (responseCallback) => {
+            if (responseCallback) {
+                console.log("Message has reached the recipient (content-full-page.js): ", action === "setStatic" ? "Set fixed/sticky elements position to static" : "Reset to fixed/sticky elements")
                 console.log("responseCallback:", responseCallback)
                 resolve()
             }
