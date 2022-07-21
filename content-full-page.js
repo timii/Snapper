@@ -185,7 +185,7 @@ chrome.runtime.onMessage.addListener(
             finalCanvas.setAttribute('width', `${window.innerWidth}px`)
             // fullPageCanvas.setAttribute('width', `600px`)
             finalCanvas.setAttribute('height', `${document.documentElement.scrollHeight}px`)
-            console.log("finalCanvas:", finalCanvas)
+            // console.log("finalCanvas:", finalCanvas)
 
             const finalCanvasContext = finalCanvas.getContext('2d')
 
@@ -228,7 +228,7 @@ chrome.runtime.onMessage.addListener(
 
                 console.log("fullPageImage after function:", fullPageImage)
 
-                document.body.appendChild(finalCanvas);
+                // document.body.appendChild(finalCanvas);
 
                 // const fullPageImage = finalCanvas.toDataURL("image/png")
                 // console.log("fullPageImage:", fullPageImage)
