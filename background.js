@@ -31,7 +31,7 @@ async function sendImageToNewTab(data, currentTabId, currentTabIndex, filename) 
                 console.log("Message has reached the recipient (snapper-image.js): Image has been sent to the new tab")
 
                 // Manually change to the newly created tab
-                // chrome.tabs.update(createdTab.id, { active: true, highlighted: true })
+                chrome.tabs.update(createdTab.id, { active: true, highlighted: true })
             }
 
         })
@@ -56,6 +56,30 @@ function createTab(currentTabId, currentTabIndex) {
     })
 }
 
+// Function that initiates the process of creating a custom area screenshot
+async function initiateCustomAreaScreenshot(currentTab, filename) {
+
+    // Hide scrollbar before capturing the tab to avoid showing the scrollbar in the selection area
+    console.log("currentTab:", currentTab)
+    await sendMessageToToggleScrollbar("hideScrollbar", currentTab)
+
+    // Capture visible tab to draw the selection area over
+    await captureTab(100).then(async (createdScreenshot) => {
+
+        if (createdScreenshot) {
+
+            // Send message to the custom area content script to display overlay
+            chrome.tabs.sendMessage(currentTab.id, { imageURI: createdScreenshot, currentTab: currentTab, filename: filename, action: "createCustomAreaScreenshot" }, (responseCallback) => {
+                if (responseCallback) {
+                    console.log("Message has reached the recipient (content-custom-area.js): Sent message to content script to create an overlay to select a custom area to screenshot")
+                }
+
+                // return true;
+            });
+        }
+    })
+}
+
 // Function that sends as message to the content script for the custom area (content-custom-area.js) to create an overlay for selecting the custom area
 function openOverlayInCurrentTab(currentTab, dataURI, filename) {
     chrome.tabs.sendMessage(currentTab.id, { imageURI: dataURI, currentTab: currentTab, filename: filename, action: "createCustomAreaScreenshot" }, (responseCallback) => {
@@ -63,7 +87,7 @@ function openOverlayInCurrentTab(currentTab, dataURI, filename) {
             console.log("Message has reached the recipient (content-custom-area.js): Sent message to content script to create an overlay to select a custom area to screenshot")
         }
 
-        return true;
+        // return true;
     });
 }
 
@@ -115,7 +139,7 @@ async function captureFullPageScreenshots(screenshotInfo) {
         console.log("in for -> i:", i)
 
         // Capture screenshot and wait 1 second between each screenshot to bypass the "MAX_CAPTURE_VISIBLE_TAB_CALLS_PER_SECOND" error
-        await captureTab().then(async (createdScreenshot) => {
+        await captureTab(1000).then(async (createdScreenshot) => {
 
             console.log("createdScreenshot:", createdScreenshot)
             console.log("screenshotsArray before:", screenshotsArray)
@@ -149,7 +173,7 @@ async function captureFullPageScreenshots(screenshotInfo) {
 }
 
 // Function to asynchronously capture the currently visible part of the active tab
-async function captureTab() {
+async function captureTab(timeout) {
     return new Promise(resolve => {
         setTimeout(() => {
             chrome.tabs.captureVisibleTab(null, { format: 'png' }, async dataURL => {
@@ -159,7 +183,7 @@ async function captureTab() {
                     resolve(dataURL)
                 }
             })
-        }, 1000)
+        }, timeout)
     })
 }
 

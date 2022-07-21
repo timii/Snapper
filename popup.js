@@ -35,24 +35,9 @@ function clickCustomArea() {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         const currentTab = tabs[0];
 
-        // TODO: use filename as the name of the created screenshot
         var filename = getFilename(currentTab.url);
 
-        let imageURI = null;
-
-        // Capture visible tab to draw the selection area over
-        chrome.tabs.captureVisibleTab(null, { format: 'png' }, (dataURI) => {
-            if (dataURI) {
-                imageURI = dataURI;
-
-                // Set filename to background script
-                // setFilename(filename);
-
-                // Send message to content script to display overlay
-                openOverlayInCurrentTab(currentTab, imageURI, filename)
-            }
-        });
-
+        initiateCustomAreaScreenshot(currentTab, filename);
     });
 }
 

@@ -52,9 +52,6 @@ chrome.runtime.onMessage.addListener(
 
                 // Add close button to overlay
                 addCloseButton();
-
-                // Disable scrolling when overlay is active
-                document.body.classList.add('disable-scrolling')
             }
 
             sendResponse(JSON.stringify(message, null, 4) || true);
@@ -66,6 +63,9 @@ chrome.runtime.onMessage.addListener(
 
 // Function to create a canvas element and draws a screenshot of the current page in it
 function createCanvasElement() {
+    // Hide scrollbar before canvas is created to avoid the image being shifted to the left by the width of the scrollbar
+    document.body.style.overflow = 'hidden';
+
     // Create canvas element
     const mainCanvas = createCanvas(canvasId, `${windowInnerWidthString}px`, `${windowInnerHeightString}px`)
 
@@ -75,7 +75,8 @@ function createCanvasElement() {
     // Workaround to create an image element and setting the src to the visibleTabImageURI to pass it into drawImage()
     const image = new Image;
     image.src = visibleTabImageURI;
-    image.onload = () => canvasContext.drawImage(image, 0, 0)
+    image.onload = () => canvasContext.drawImage(image, 0, 0, window.innerWidth, window.innerHeight)
+
 
     offsetX = mainCanvas.offsetLeft;
     offsetY = mainCanvas.offsetTop;
@@ -102,11 +103,10 @@ function createCanvasElement() {
             mouseX = parseInt(e.clientX - offsetX);
             mouseY = parseInt(e.clientY - offsetY);
 
-            // TODO: change stroke color for other color of selection area
+            // Clear canvas and draw a new rectangle on every mouse move
             canvasContext.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
-            canvasContext.beginPath();
-            canvasContext.rect(startX, startY, mouseX - startX, mouseY - startY);
-            canvasContext.stroke();
+            canvasContext.strokeRect(startX, startY, mouseX - startX, mouseY - startY);
+            canvasContext.strokeStyle = 'red'
         }
     }
 
@@ -155,7 +155,7 @@ function addCloseButton() {
         allVideosOnPage.forEach(vid => vid.play());
 
         // Enable scrolling again 
-        document.body.classList.remove('disable-scrolling')
+        document.body.style.overflow = 'visible';
     }
 
 

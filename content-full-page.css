@@ -1,7 +1,5 @@
 #snapper-full-page-canvas {
     z-index: 99999;
-    /* position: fixed; */
     top: 100;
     left: 100;
-    border-radius: 1px solid red;
 }

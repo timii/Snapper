@@ -38,6 +38,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
         sendResponse(JSON.stringify(message, null, 4) || true)
 
-        // return true;
+        return true;
     }
 })
