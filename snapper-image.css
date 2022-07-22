@@ -14,25 +14,27 @@ html, body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding: 0 25px 50px;
 }
 
 .header_container {
     position: sticky;
     width: 100%;
     top: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .header_bar {
     background-color: brown;
     height: 50px;
     width: 30%;
-    margin: 5% auto 0;
-    border-radius: 10px;
+    border-radius: 0 0 10px 10px;
     box-shadow: var(--box-shadow);
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: 50px;
 }
 
 .utils_container {
