@@ -6,6 +6,7 @@ const canvasId = "snapper-canvas";
 const clippedCanvasId = "snapper-clipped-canvas";
 
 const allVideosOnPage = document.querySelectorAll('video');
+const allVideosPlaying = [];
 
 const windowInnerWidthString = window.innerWidth.toString();
 const windowInnerHeightString = window.innerHeight.toString();
@@ -126,8 +127,13 @@ function createOverlayElement() {
 
     siteOverlay.setAttribute('id', overlayId);
 
-    // Get all videos on the page and pause them -> unpause them when closing the overlay
-    allVideosOnPage.forEach(vid => vid.pause());
+    // Save and pause every video on the page that is currently playing
+    allVideosOnPage.forEach(video => {
+        if (!video.paused) {
+            allVideosPlaying.push(video)
+            video.pause()
+        }
+    })
 
     // Add created overlay to body to show in current tab
     document.body.appendChild(siteOverlay);
@@ -150,9 +156,8 @@ function addCloseButton() {
         document.body.removeChild(overlay);
         document.body.removeChild(closeButton);
 
-        // Unpause all paused videos
-        // TODO: get al list of all play videos before and only pause them to unpause only them after so no videos get unpaused that werent playing before
-        allVideosOnPage.forEach(vid => vid.play());
+        // Unpause all paused videos that were playing before
+        allVideosPlaying.forEach(vid => vid.play());
 
         // Enable scrolling again 
         document.body.style.overflow = 'visible';
