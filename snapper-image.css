@@ -59,10 +59,11 @@ html, body {
     color: white;
     display: flex;
     align-items: center;
+    transition: background-color 0.25s;
 }
 
 .utils_button:hover {
-    background-color: rgba(0, 214, 0, 0.5);
+    background-color: #df1e25;
 }
 
 .button_icon {
