@@ -33,6 +33,7 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: 0 0 10px 10px;
 }
 
 .header_divider {
