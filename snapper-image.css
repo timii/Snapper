@@ -30,8 +30,6 @@ html, body {
     background-color: #30A9DE;
     height: 50px;
     min-width: 400px;
-    border-radius: 0 0 10px 10px;
-    box-shadow: var(--box-shadow);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -76,7 +74,7 @@ html, body {
     object-fit: contain;
     cursor: zoom-in;
     box-shadow: var(--box-shadow);
-    border-radius: 10px;
+    border: 1px solid #090707;
     margin-top: 50px;
     transition: background-color 1s ease-in-out;
 }

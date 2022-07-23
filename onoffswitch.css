@@ -43,13 +43,13 @@
   .onoffswitch-inner:before {
     content: "ON";
     padding-left: 10px;
-    background-color: #323f4b;
-    color: #e6e6e6;
+    background-color: var(--dark-color);
+    color: var(--light-color);
   }
   .onoffswitch-inner:after {
     content: "OFF";
     padding-right: 10px;
-    background-color: #eeeeee;
+    background-color: var(--light-color);
     color: #323f4b;
     text-align: right;
   }

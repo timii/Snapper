@@ -4,19 +4,46 @@
 
 /* Light mode styles */
 body {
+  --dark-color: #121212;
+  --light-color: #f0f0f0;
+  --button-background-color: #f0f0f0;
+  --button-text-color: var(--dark-color);
+  --custom-area-icon-light: url('images/area_white.png');
+  --custom-area-icon-dark: url('images/area_black.png');
+  --custom-area-icon: var(--custom-area-icon-dark);
+  --visible-area-icon-light: url('images/visible_white.png');
+  --visible-area-icon-dark: url('images/visible_black.png');
+  --visible-area-icon: var(--visible-area-icon-dark);
+  --full-page-icon-light: url('images/full_white.png');
+  --full-page-icon-dark: url('images/full_black.png');
+  --full-page-icon: var(--full-page-icon-dark);
+  --button-hover-light: #dfdfdf;
+  --button-hover-dark: #3e4c59;
+  --button-hover-color: var(--button-hover-light);
+  --button-active-light: #cecece;
+  --button-active-dark: #52606d;  
+  --button-active-color: var(--button-active-light);  
+
   font-family: "Rubik", sans-serif, "Helvetica", "Arial", "Sans-Serif";
   box-sizing: border-box;
   margin: 0;
   width: 200px;
-  background-color: #e6e6e6;
-  color: #1f2933;
+  background-color: var(--light-color);
+  color: var(--dark-color);
   line-height: 1.2rem;
 }
 
 /* Dark mode styles */
 body.dark-theme {
-  background-color: #1f2933;
-  color: #e6e6e6;
+  background-color: var(--dark-color);
+  color: var(--light-color);
+  --button-background-color: #323f4b;
+  --button-text-color: var(--light-color);
+  --custom-area-icon: var(--custom-area-icon-light);
+  --visible-area-icon: var(--visible-area-icon-light);
+  --full-page-icon: var(--full-page-icon-light);
+  --button-hover-color: var(--button-hover-dark);
+  --button-active-color: var(--button-active-dark);  
 }
 
 .btn-group {
@@ -31,8 +58,8 @@ body.dark-theme {
   border-radius: 4px;
   border: 1px #52606d solid;
   margin-top: 5px;
-  background-color: #323f4b;
-  color: #e6e6e6;
+  background-color: var(--button-background-color);
+  color: var(--button-text-color);
   outline: none;
   font-size: 1em;
   font-weight: bold;
@@ -41,11 +68,33 @@ body.dark-theme {
 }
 
 .btn-group button:hover {
-  background-color: #3e4c59;
+  background-color: var(--button-hover-color);
 }
 
 .btn-group button:active {
-  background-color: #52606d;
+  background-color: var(--button-active-color);
+}
+
+.btn-icon {
+  height: 18px;
+  width: 18px;
+  background-repeat: no-repeat;
+  display: inline-block;
+  background-size: 20px;
+  margin-bottom: -3px;
+  margin-right: 4px;
+}
+
+#custom-btn-icon {
+  background-image: var(--custom-area-icon);
+}
+
+#visible-btn-icon {
+  background-image: var(--visible-area-icon);
+}
+
+#full-btn-icon {
+  background-image: var(--full-page-icon);
 }
 
 p {
