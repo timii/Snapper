@@ -19,7 +19,6 @@ function getFilename(url) {
 
     if (pathname !== "-") pathname += "-"
 
-
     return 'snapper-' + hostname + pathname + dateTime + '.png';
 }
 
