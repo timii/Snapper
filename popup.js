@@ -1,6 +1,6 @@
 'use strict';
 
-// Function to create file name for the screenshot
+// Function to create a file name for the screenshot
 function getFilename(url) {
     // Creates a url object to parse the url more easily
     url = new URL(url);
@@ -30,12 +30,11 @@ function getFilename(url) {
 document.getElementById("customArea").addEventListener("click", clickCustomArea);
 
 // Function to call when "Custom Area" button is clicked.
-// Calls everything needed to create a screenshot of a custom area
 function clickCustomArea() {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         const currentTab = tabs[0];
 
-        var filename = getFilename(currentTab.url);
+        let filename = getFilename(currentTab.url);
 
         initiateCustomAreaScreenshot(currentTab, filename);
     });
@@ -48,31 +47,18 @@ function clickCustomArea() {
 
 // EventListener for "Visible Content" button
 document.getElementById("visibleContent").addEventListener("click", clickVisibleContent);
-var imagetest = document.getElementById("test")
 
 // Function to call when "Visible Content" button is clicked.
 function clickVisibleContent() {
-    let filename;
-
     // Get current active tab inforamtion 
     chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
         const currentTab = tabs[0];
 
-        //  Create a filename from the site url and the current date and time
-        filename = getFilename(currentTab.url)
+        let filename = getFilename(currentTab.url)
 
-        // Start capturing the visible content of current active tab
+        // Start capturing the visible content of the currently active tab
         chrome.tabs.captureVisibleTab(null, { format: 'png' }, (dataURL) => {
             if (dataURL) {
-                // console.log("filename: ", filename)
-                // filename = filename.substring(0, filename.length - 4)
-                // console.log("filename: ", filename)
-
-                // Set filename to background script
-                // setFilename(filename);
-
-
-                // Create data object including everything needed to show the image on the new tab
                 var data = {
                     image: dataURL,
                     width: window.innerWidth,
@@ -96,25 +82,13 @@ function clickVisibleContent() {
 document.getElementById("fullPage").addEventListener("click", clickFullPage);
 
 // Function to call when "Full Page" button is clicked.
-// Calls everything needed to create a full page screenshot
 function clickFullPage() {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         const currentTab = tabs[0];
 
         var filename = getFilename(currentTab.url);
-        // console.log("tabs: ", tabs, " tabs[0]: ", tab, " tab.url: ", tab.url)
-        // console.log("currentTab size: ", currentTab.width, currentTab.height, " currentTab id: ", currentTab.id, " currentTab.url: ", currentTab.url, " currentTabIndex: ", currentTab.index)
-        console.log("filename: ", filename);
-
-        // Set filename to background script
-        // setFilename(filename);
 
         initiateFullPageScreenshot(currentTab, filename);
-
-        // Send the image including additional information to new tab
-        // sendImageToNewTab(data, currentTab.id, currentTab.index, filename)
-
-        // call api to create screenshot
     });
 }
 

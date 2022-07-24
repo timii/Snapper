@@ -3,7 +3,7 @@
 // Function to send an image + additional information to a new tab
 async function sendImageToNewTab(data, currentTabId, currentTabIndex, filename) {
 
-    // Create new tab to place the create screenshot in
+    // Create new tab to place the created screenshot in
     const createdTabPromise = createTab(currentTabId, currentTabIndex)
 
     // Run when promise is fulfilled (content script on new tab loaded)
@@ -22,7 +22,6 @@ async function sendImageToNewTab(data, currentTabId, currentTabIndex, filename) 
 
         // Add action and filename to data object
         data.action = "sendImageToNewTab"
-        console.log("filename:", filename)
         data.filename = filename;
 
         // Send the image + additional information to the newly created tab
@@ -41,13 +40,10 @@ async function sendImageToNewTab(data, currentTabId, currentTabIndex, filename) 
 
 // Function to asynchronously create a new tab and return created tab after its content script is loaded
 function createTab(currentTabId, currentTabIndex) {
-    console.info("createTab() called!")
     return new Promise(resolve => {
         chrome.tabs.create({ active: false, url: 'snapper-image.html', openerTabId: currentTabId, index: currentTabIndex + 1 }, async createdTab => {
             chrome.tabs.onUpdated.addListener(function listener(tabId, info) {
-                console.log("not complete!")
                 if (info.status === "complete" && tabId === createdTab.id) {
-                    console.log("complete!")
                     chrome.tabs.onUpdated.removeListener(listener);
                     resolve(createdTab);
                 }
@@ -60,61 +56,39 @@ function createTab(currentTabId, currentTabIndex) {
 async function initiateCustomAreaScreenshot(currentTab, filename) {
 
     // Hide scrollbar before capturing the tab to avoid showing the scrollbar in the selection area
-    console.log("currentTab:", currentTab)
     await sendMessageToToggleScrollbar("hideScrollbar", currentTab)
 
     // Capture visible tab to draw the selection area over
     await captureTab(100).then(async (createdScreenshot) => {
 
         if (createdScreenshot) {
-
             // Send message to the custom area content script to display overlay
             chrome.tabs.sendMessage(currentTab.id, { imageURI: createdScreenshot, currentTab: currentTab, filename: filename, action: "createCustomAreaScreenshot" }, (responseCallback) => {
                 if (responseCallback) {
                     console.log("Message has reached the recipient (content-custom-area.js): Sent message to content script to create an overlay to select a custom area to screenshot")
                 }
-
-                // return true;
             });
         }
     })
 }
 
-// Function that sends as message to the content script for the custom area (content-custom-area.js) to create an overlay for selecting the custom area
-function openOverlayInCurrentTab(currentTab, dataURI, filename) {
-    chrome.tabs.sendMessage(currentTab.id, { imageURI: dataURI, currentTab: currentTab, filename: filename, action: "createCustomAreaScreenshot" }, (responseCallback) => {
-        if (responseCallback) {
-            console.log("Message has reached the recipient (content-custom-area.js): Sent message to content script to create an overlay to select a custom area to screenshot")
-        }
-
-        // return true;
-    });
-}
-
-// Function to listen to custom area content script to call sendImageToNewTab()
+// Function to listen to the custom area content script (content-custom-area.js) to send the custom area image to the new tab
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    // Only call sendImageToNewTab() if the message was sent for the background script
     if (message.data.action === "sendCustomAreaScreenshot") {
-
         // Call sendImageToNewTab() with the new screenshot of the selected area
         sendImageToNewTab(message.data, message.currentTabId, message.currentTabIndex, message.filename)
 
         sendResponse(JSON.stringify(message, null, 4) || true)
-
-        // return true;
     }
 })
 
-// Function that sends as message to the content script for the full page (content-full-page.js) to create a screenshot of the full page
+// Function that sends a message to the full page content script (content-full-page.js) to get the needed information about the current page (e.g: window height, how many screenshots need to be taken, how much of the last screenshot needs to be cut off)
 function initiateFullPageScreenshot(currentTab, filename) {
-    console.log("createFullPageScreenshot() currentTab", currentTab, " filename:", filename)
-
-    chrome.tabs.sendMessage(currentTab.id, { currentTab: currentTab, filename: filename, action: "createFullPageScreenshot" }, (responseCallback) => {
-        if (responseCallback) {
-            console.log("responseCallback:", responseCallback)
+    chrome.tabs.sendMessage(currentTab.id, { currentTab: currentTab, filename: filename, action: "createFullPageScreenshot" }, (screenshotInfo) => {
+        if (screenshotInfo) {
             console.log("Message has reached the recipient (content-full-page.js): Sent message to content script to create a full page screenshot")
 
-            captureFullPageScreenshots(responseCallback)
+            captureFullPageScreenshots(screenshotInfo)
         }
 
     });
@@ -122,64 +96,49 @@ function initiateFullPageScreenshot(currentTab, filename) {
 
 // Function to start the process of capturing the full page screenshots
 async function captureFullPageScreenshots(screenshotInfo) {
-    console.log("captureFullPageScreenshots -> screenshotInfo:", screenshotInfo)
-    console.log("screenshotAmount:", screenshotInfo.screenshotAmount)
-
     var screenshotsArray = []
 
+    // Get current scroll position on the page and reset it to 0
     const currentScrollPostition = await sendMessageToResetScrolling("resetScrolling", screenshotInfo.currentTab)
-
-    console.log("currentScrollPostition in background:", currentScrollPostition)
 
     // Hide the scrollbar while taking screenshots
     await sendMessageToToggleScrollbar("hideScrollbar", screenshotInfo.currentTab)
 
     // Capture as many screenshots needed to capture the whole page
     for (let i = 0; i < screenshotInfo.screenshotAmount; i++) {
-        console.log("in for -> i:", i)
 
         // Capture screenshot and wait 1 second between each screenshot to bypass the "MAX_CAPTURE_VISIBLE_TAB_CALLS_PER_SECOND" error
         await captureTab(1000).then(async (createdScreenshot) => {
 
-            console.log("createdScreenshot:", createdScreenshot)
-            console.log("screenshotsArray before:", screenshotsArray)
-            // Store the created screenshot into the array of all screenshots
+            // Save the created screenshot in the array of all screenshots
             screenshotsArray.push(createdScreenshot)
-            console.log("screenshotsArray after:", screenshotsArray)
 
-            console.log("windowHeight:", screenshotInfo.windowHeight)
-
+            // Set fixed and sticky elements to static after the first screenshot to only show them in the first image
             if (i === 0) {
-                // Set fixed and sticky elements to static after the first screenshot to hide them from every screenshot after it
                 await sendMessageToToggleStickyAndFixedElements("setStatic", screenshotInfo.currentTab)
             }
 
-            // Send message to full page content script to scroll down
+            // Send message to full page content script (content-full-page.js) to scroll down
             await sendMessageToScrollDown("scrollDownPage", screenshotInfo.windowHeight, screenshotInfo.currentTab, screenshotInfo.filename)
         })
-
-
     }
 
     // Reset fixed and sticky elements after all screenshots have been taken
     await sendMessageToToggleStickyAndFixedElements("resetToStickyAndFixed", screenshotInfo.currentTab)
 
-    // Show the scrollbar after all the screenshots have been taken
+    // Show the scrollbar again after all the screenshots have been taken
     await sendMessageToToggleScrollbar("showScrollbar", screenshotInfo.currentTab)
-    console.log("after for loop")
-    console.log("screenshotInfo:", screenshotInfo)
 
+    // Send the array of screenshots + additional information to the full page content script (content-full-page.js) to draw all the screenshots into one big canvas
     await sendMessageToCreateFullPageCanvas("createFullPageCanvas", screenshotInfo.currentTab, { screenshotsArray: screenshotsArray, cutoffPercent: screenshotInfo.cutoffPercent, windowHeight: screenshotInfo.windowHeight, bodyHeight: screenshotInfo.bodyHeight, filename: screenshotInfo.filename, startScrollPosition: currentScrollPostition })
 }
 
-// Function to asynchronously capture the currently visible part of the active tab
+// Function to asynchronously capture the currently visible part of the active tab and return the screenshot
 async function captureTab(timeout) {
     return new Promise(resolve => {
         setTimeout(() => {
             chrome.tabs.captureVisibleTab(null, { format: 'png' }, async dataURL => {
-                console.log("in captureVisibleTab")
                 if (dataURL) {
-                    // console.log("dataURL:", dataURL)
                     resolve(dataURL)
                 }
             })
@@ -193,7 +152,7 @@ async function sendMessageToScrollDown(action, windowHeight, currentTab) {
     return new Promise(resolve => {
         chrome.tabs.sendMessage(currentTab.id, { action: action, windowHeight: windowHeight }, (responseCallback) => {
             if (responseCallback) {
-                console.log("Message has reached the recipient (content-full-page.js): Sent message to content script to scroll down by ")
+                console.log("Message has reached the recipient (content-full-page.js): Sent message to content script to scroll down by ", windowHeight)
                 resolve()
             }
 
@@ -201,14 +160,12 @@ async function sendMessageToScrollDown(action, windowHeight, currentTab) {
     })
 }
 
-// Function to call the full page content script to reset the scrolling on the currently active tab
+// Function to call the full page content script (content-full-page.js) to reset the scrolling on the currently active tab
 async function sendMessageToResetScrolling(action, currentTab) {
-    console.log("action:", action, " currentTab:", currentTab)
     return new Promise(resolve => {
         chrome.tabs.sendMessage(currentTab.id, { action: action }, (responseCallback) => {
             if (responseCallback) {
                 console.log("Message has reached the recipient (content-full-page.js): Reset scroll position to the top")
-                console.log("responseCallback:", responseCallback)
                 resolve(responseCallback === true ? 0 : responseCallback)
             }
 
@@ -216,14 +173,12 @@ async function sendMessageToResetScrolling(action, currentTab) {
     })
 }
 
-// Function to call the full page content script to hide/show the scrollbar
+// Function to call the full page content script (content-full-page.js) to hide/show the scrollbar
 async function sendMessageToToggleScrollbar(action, currentTab) {
-    console.log("action:", action, " currentTab:", currentTab)
     return new Promise(resolve => {
         chrome.tabs.sendMessage(currentTab.id, { action: action }, (responseCallback) => {
             if (responseCallback) {
-                console.log("Message has reached the recipient (content-full-page.js): ", action === "hideScrollbar" ? "Hide" : "Show", "scrollbar")
-                console.log("responseCallback:", responseCallback)
+                console.log("Message has reached the recipient (content-full-page.js): ", action === "hideScrollbar" ? "Hide" : "Show", " the scrollbar")
                 resolve()
             }
 
@@ -231,14 +186,12 @@ async function sendMessageToToggleScrollbar(action, currentTab) {
     })
 }
 
-// Function to call the full page content script to set/reset fixed and sticky elements
+// Function to call the full page content script (content-full-page.js) to set/reset fixed and sticky elements
 async function sendMessageToToggleStickyAndFixedElements(action, currentTab) {
-    console.log("action:", action, " currentTab:", currentTab)
     return new Promise(resolve => {
         chrome.tabs.sendMessage(currentTab.id, { action: action }, (responseCallback) => {
             if (responseCallback) {
                 console.log("Message has reached the recipient (content-full-page.js): ", action === "setStatic" ? "Set fixed/sticky elements position to static" : "Reset to fixed/sticky elements")
-                console.log("responseCallback:", responseCallback)
                 resolve()
             }
 
@@ -246,13 +199,12 @@ async function sendMessageToToggleStickyAndFixedElements(action, currentTab) {
     })
 }
 
-// Function to call the full page content script to reset the scrolling on the currently active tab
+// Function to call the full page content script (content-full-page.js) to draw all the screenshots into one big canvas
 async function sendMessageToCreateFullPageCanvas(action, currentTab, args) {
-    console.log("action:", action, " currentTab:", currentTab, " args:", args)
     return new Promise(resolve => {
         chrome.tabs.sendMessage(currentTab.id, { action: action, currentTab: currentTab, args: args }, (responseCallback) => {
             if (responseCallback) {
-                console.log("Message has reached the recipient (content-full-page.js): Create full page canvas")
+                console.log("Message has reached the recipient (content-full-page.js): Create full page canvas with all the captured screenshots")
                 resolve()
             }
 
@@ -260,17 +212,12 @@ async function sendMessageToCreateFullPageCanvas(action, currentTab, args) {
     })
 }
 
-// Function to listen to full page content script to call sendImageToNewTab()
+// Function to listen to the full page content script (content-full-page.js) to call send the full page image to the new tab
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    // Only call sendImageToNewTab() if the message was sent for the background script
     if (message.data.action === "sendFullPageScreenshot") {
-
-        console.log("sendImageToNewTab for full page image")
-        // Call sendImageToNewTab() with the new screenshot of the selected area
+        // Call sendImageToNewTab() with the new screenshot of the full page
         sendImageToNewTab(message.data, message.currentTabId, message.currentTabIndex, message.filename)
 
         sendResponse(JSON.stringify(message, null, 4) || true)
-
-        // return true;
     }
 })

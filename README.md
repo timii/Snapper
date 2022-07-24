@@ -24,3 +24,5 @@ the area you want to screenshot:
 - Custom Area: choose your own area to screenshot
 - Visible Content: screenshot only the content currently visible
 - Full Page: screenshot the whole website
+
+After the screenshot has been taken, you will be redirected to a new tab showcasing the created screenshot with an option to download the image.

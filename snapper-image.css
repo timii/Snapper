@@ -39,7 +39,7 @@ html, body {
 .header_divider {
     width: 375px;
     height: 5px;
-    /* Create gradient transparent edges on both sides */
+    /* Create gradient with transparent edges on both sides */
     background: linear-gradient(to right, rgba(255,255,255,0) 0%,rgba(239,220,5,1) 20%,rgba(239,220,5,1) 78%,rgba(239,220,5,0.91) 80%,rgba(255,255,255,0) 100%);
 }
 
@@ -48,19 +48,21 @@ html, body {
     align-items: center;
     justify-content: center;
     background-color: #E53A40;
-    width: 200px;
+    width: fit-content;
     margin: auto;
     border-bottom-right-radius: 10px;
     border-bottom-left-radius: 10px;
 }
 
 .utils_button {
-    padding: 8px;
+    padding: 10px;
     text-decoration: none;
     color: white;
     display: flex;
     align-items: center;
     transition: background-color 0.25s;
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 10px;
 }
 
 .utils_button:hover {
@@ -76,7 +78,6 @@ html, body {
     object-fit: contain;
     cursor: zoom-in;
     box-shadow: var(--box-shadow);
-    border: 1px solid #090707;
     margin-top: 50px;
     transition: background-color 1s ease-in-out;
 }
