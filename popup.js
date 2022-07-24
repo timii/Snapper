@@ -6,7 +6,7 @@ function getFilename(url) {
     url = new URL(url);
 
     // Get the hostname and pathname of the url
-    const hostname = url.hostname.split(".")[0];
+    const hostname = url.hostname.split(".").length > 2 ? url.hostname.split(".")[1] : url.hostname.split(".")[0];
     var pathname = url.pathname.replace(/\//g, '-');
 
     // Get current date and time
@@ -19,7 +19,8 @@ function getFilename(url) {
 
     if (pathname !== "-") pathname += "-"
 
-    return 'snapper' + pathname + hostname + '-' + dateTime + '.png';
+
+    return 'snapper-' + hostname + pathname + dateTime + '.png';
 }
 
 // 
