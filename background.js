@@ -148,7 +148,6 @@ async function captureTab(timeout) {
 
 // Function to call the full page content script to scroll down by the value widnowHeight
 async function sendMessageToScrollDown(action, windowHeight, currentTab) {
-    console.log("action:", action, " windowHeight:", windowHeight, " currentTab:", currentTab)
     return new Promise(resolve => {
         chrome.tabs.sendMessage(currentTab.id, { action: action, windowHeight: windowHeight }, (responseCallback) => {
             if (responseCallback) {
@@ -178,7 +177,7 @@ async function sendMessageToToggleScrollbar(action, currentTab) {
     return new Promise(resolve => {
         chrome.tabs.sendMessage(currentTab.id, { action: action }, (responseCallback) => {
             if (responseCallback) {
-                console.log("Message has reached the recipient (content-full-page.js): ", action === "hideScrollbar" ? "Hide" : "Show", " the scrollbar")
+                console.log("Message has reached the recipient (content-full-page.js):", action === "hideScrollbar" ? "Hide" : "Show", "the scrollbar")
                 resolve()
             }
 
@@ -191,7 +190,7 @@ async function sendMessageToToggleStickyAndFixedElements(action, currentTab) {
     return new Promise(resolve => {
         chrome.tabs.sendMessage(currentTab.id, { action: action }, (responseCallback) => {
             if (responseCallback) {
-                console.log("Message has reached the recipient (content-full-page.js): ", action === "setStatic" ? "Set fixed/sticky elements position to static" : "Reset to fixed/sticky elements")
+                console.log("Message has reached the recipient (content-full-page.js):", action === "setStatic" ? "Set fixed/sticky elements position to static" : "Reset to fixed/sticky elements")
                 resolve()
             }
 
