@@ -27,4 +27,6 @@ the area you want to screenshot:
 - Visible Content: screenshot only the content currently visible
 - Full Page: screenshot the whole website
 
-After the screenshot has been taken, you will be redirected to a new tab showcasing the created screenshot with an option to download the image.
+> Tip: If none of the options work right after adding the extension to chrome, refresh the website you want to screenshot and it should work as expected afterwards.
+
+After the screenshot has been taken, you will be redirected to a new tab showcasing the created screenshot with an option to download the image. 
