@@ -1,12 +1,10 @@
 # Snapper
 
-TODO: Fix before publishing to the chrome web store. Currently when installing the app from the web store and try to use anything it only shows "Revieving end does not exist. Probably just need to refactor to use longlived connections.
-
 Your easy-to-use chrome extension for taking screenshots in your browser.
 
 ## Installation
 
-**Option 1** -> Go to (link to chrome store page) and press `Add to Chrome`.
+**Option 1** -> Go to the [Chrome Web Store](https://chrome.google.com/webstore/category/extensions) and search for "Snapper" or follow the [direct link to the extension page](https://chrome.google.com/webstore/detail/snapper/opchjelombkjeoleoaganhaofjgjnbod) and press `Add to Chrome`.
 
 **Option 2** -> Install it from source:
 
